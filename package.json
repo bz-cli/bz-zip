@@ -1,0 +1,32 @@
+{
+  "name": "bz-zip",
+  "version": "1.1.1",
+  "description": ".BIZC file bundler",
+  "main": "./build/bz-zip.js",
+  "bin": {
+    "bz-zip": "./build/bz-zip.js"
+  },
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "commander": "^2.9.0",
+    "jszip": "^3.1.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0"
+  },
+  "scripts": {
+    "dev": "babel src --out-dir build --watch"
+  },
+  "keywords": [
+    "Bizagi Studio",
+    "JsZip",
+    "File Compression",
+    ".BIZC"
+  ],
+  "author": "Carlos Camilo Lobo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Platekun/bz-zip.git"
+  }
+}
