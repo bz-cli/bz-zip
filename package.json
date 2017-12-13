@@ -1,23 +1,16 @@
 {
   "name": "bz-zip",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Compress your directories to .bizc files",
   "bin": {
-    "bz-zip": "dist/index.js"
+    "bz-zip": "index.js"
   },
   "dependencies": {
-    "chalk": "^1.1.3",
-    "commander": "^2.9.0",
+    "commander": "^2.12.2",
     "jszip": "^3.1.3",
     "normalize-path": "^2.1.1"
   },
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-env": "^1.4.0"
-  },
-  "scripts": {
-    "dev": "babel src --out-dir dist --watch"
-  },
+  "devDependencies": {},
   "keywords": [
     "Bizagi",
     "Bizagi Studio",
