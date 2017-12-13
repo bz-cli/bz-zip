@@ -1,81 +1,80 @@
+import { join, resolve } from 'path';
+import normalize from 'normalize-path';
+
 export default {
-    init(deps) {
-        this.fs = deps.fs;
-        this.path = deps.path;
-        this.JSZip = deps.JSZip;
+	init(deps) {
+		this.fs = deps.fs;
+		this.path = deps.path;
+		this.JSZip = deps.JSZip;
 
-        this.walk = this.walk.bind(this);
-        this.buildZipData = this.buildZipData.bind(this);
-        this.bundle = this.bundle.bind(this);
-        
-        return this;
-    },
+		this.walk = this.walk.bind(this);
+		this.buildZipData = this.buildZipData.bind(this);
+		this.bundle = this.bundle.bind(this);
 
-    zip(connectorName) {
-        const { buildZipData, bundle, path } = this;
-        const { resolve } = path;
+		return this;
+	},
 
-        const connectorPath = `${resolve(connectorName)}/`;
+	zip(connectorName) {
+		const { buildZipData, bundle, path } = this;
+		const { resolve } = path;
 
-        try {
-            const zipData = buildZipData(connectorPath);
-            return bundle(connectorPath, zipData)
-                .catch(err => Promise.reject(err));
-        } catch(err) {
-            return Promise.reject(err);
-        }
-    },
+        const connectorPath = resolve(join(connectorName, '/'));
 
-    buildZipData(connectorPath) {
-        const { walk, JSZip, fs } = this;
-        const { createReadStream } = fs;
+		try {
+			const zipData = buildZipData(connectorPath);
+			return bundle(zipData).catch((err) => Promise.reject(err));
+		} catch (err) {
+			return Promise.reject(err);
+		}
+	},
 
-        const fileList = walk(connectorPath);
-        const zip = new JSZip();
+	buildZipData(connectorPath) {
+		const { walk, JSZip, fs } = this;
+		const { createReadStream } = fs;
 
-        let fileName;
-        let content;
+		const fileList = walk(connectorPath);
+		const zip = new JSZip();
 
-        fileList.forEach(file => {
-            fileName = file.substring(connectorPath.length, file.length);
-            content = createReadStream(file);
-            zip.file(fileName, content);
-        });
+		let fileName;
+		let content;
 
-        return zip;
-    },
+		fileList.forEach((file) => {
+            fileName = process.platform === 'win32'
+                ? normalize(file.substring(connectorPath.length + 1, file.length))
+                : file.substring(connectorPath.length, file.length)
+			content = createReadStream(file);
+			zip.file(fileName, content);
+		});
 
-    bundle(connectorPath, data) {
-        const { fs } = this;
-        const { writeFileSync } = fs;
-        const nameStart = connectorPath.lastIndexOf('\\');
-        const bundleName = connectorPath.substring(nameStart + 1, connectorPath.length - 1);
+		return zip;
+	},
 
-        return data
-            .generateAsync({ type: 'nodebuffer' })
-            .then(stream => {
-                writeFileSync(`${bundleName}.bizc`, stream);
-            });
-    },
+	bundle(data) {
+		const { fs } = this;
+		const { writeFileSync } = fs;
 
-    walk(dir, filelist) {
-        const { fs, path, walk } = this;
-        const { readdirSync, statSync } = fs;
-        const { join } = path;
+		return data.generateAsync({ type: 'nodebuffer' }).then((stream) => {
+			writeFileSync('Connector.bizc', stream);
+		});
+	},
 
-        let files = readdirSync(dir);
-        filelist = filelist || [];
+	walk(dir, filelist) {
+		const { fs, path, walk } = this;
+		const { readdirSync, statSync } = fs;
 
-        files.forEach(file => {
-            let isDirectory = statSync(join(dir, file)).isDirectory();
+		let files = readdirSync(dir);
+		filelist = filelist || [];
 
-            if(isDirectory) {
-                filelist =  walk(join(dir, file), filelist);
-            } else {
-                filelist.push(join(dir, file));
-            }
-        });
+		files.forEach((file) => {
+			let isDirectory = statSync(join(dir, file)).isDirectory();
 
-        return filelist;
-    }
-}
+			if (isDirectory) {
+				filelist = walk(join(dir, file), filelist);
+			} else {
+				filelist.push(join(dir, file));
+			}
+		});
+
+		return filelist;
+	}
+};
