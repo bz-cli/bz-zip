@@ -1,6 +1,6 @@
 {
   "name": "bz-zip",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Compress your directories to .bizc files",
   "bin": {
     "bz-zip": "index.js"
